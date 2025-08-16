@@ -10,8 +10,11 @@ import { DreamprintOrder, getOrderByClaimId, updateOrderStatus } from "@/lib/sup
 import { abi } from "@/app/utils/nft-abi.json";
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
 
-// Flow EVM testnet - 0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e
-const CONTRACT_ADDRESS = "0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e" as `0x${string}`;
+// Contract addresses for different networks
+const CONTRACT_ADDRESSES = {
+  testnet: "0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e", // Flow EVM testnet
+  mainnet: "0xb861d6d79123ADa308E5F4030F458b402E2D131A"  // Flow EVM mainnet
+} as const;
 
 export default function ClaimPage() {
   const params = useParams();
@@ -21,6 +24,7 @@ export default function ClaimPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [transactionHash, setTransactionHash] = useState<string>("");
+  const [useMainnet, setUseMainnet] = useState(false); // Default to testnet
 
   useEffect(() => {
     const checkNetwork = async () => {
@@ -28,8 +32,8 @@ export default function ClaimPage() {
         try {
           const currentNetwork = await getNetwork(primaryWallet.connector);
           
-          if (currentNetwork !== 545) {
-            alert('Please switch to EVM Flow testnet');
+          if (currentNetwork !== 545 && currentNetwork !== 74) {
+            alert('Please switch to EVM Flow testnet or mainnet');
           }
         } catch (error) {
           console.error('Failed to get network:', error);
@@ -91,9 +95,12 @@ export default function ClaimPage() {
       // Get wallet client
       const walletClient = await primaryWallet.getWalletClient();
       
+      // Get the correct contract address based on selected network
+      const contractAddress = useMainnet ? CONTRACT_ADDRESSES.mainnet : CONTRACT_ADDRESSES.testnet;
+      
       // Call the mint function on the smart contract
       const hash = await walletClient.writeContract({
-        address: CONTRACT_ADDRESS,
+        address: contractAddress as `0x${string}`,
         abi: abi,
         functionName: "mint",
         args: [claimId, primaryWallet.address as `0x${string}`],
@@ -297,12 +304,27 @@ export default function ClaimPage() {
                 {/* Show different buttons based on mint status */}
                 {!order.minted_status ? (
                   <div>
+                    {/* Network Selection Toggle */}
+                    <div className="flex items-center justify-end space-x-3 mb-3">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={useMainnet}
+                          onChange={(e) => setUseMainnet(e.target.checked)}
+                          disabled={loading}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                      </label>
+                      <span className="text-sm text-gray-600">Mainnet</span>
+                    </div>
+                    
                     <Button
                       onClick={handleMintNFT}
                       disabled={loading}
                       className="w-full bg-purple-500 text-white hover:bg-purple-600"
                     >
-                      {loading ? "Minting..." : "🎨 Mint as NFT"}
+                      {loading ? "Minting..." : `🎨 Mint as NFT`}
                     </Button>
                     {order.image_url && (
                                               <div className="mt-2 w-full" style={{ textAlign: 'right' }}>
