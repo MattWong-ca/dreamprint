@@ -1,4 +1,10 @@
 import React from 'react';
+import { Poppins } from "next/font/google";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'outline';
@@ -12,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
   children, 
   ...props 
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
   
   const variantClasses = {
     default: 'bg-black text-white hover:bg-gray-800',
@@ -24,7 +30,7 @@ const Button: React.FC<ButtonProps> = ({
     lg: 'h-12 px-6 py-3 text-lg'
   };
   
-  const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+  const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${poppins.className} ${className}`;
   
   return (
     <button className={classes} {...props}>

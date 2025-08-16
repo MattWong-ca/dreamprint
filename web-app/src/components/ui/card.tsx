@@ -1,9 +1,13 @@
 import React from 'react';
+import { Poppins } from "next/font/google";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
-const Card: React.FC<CardProps> = ({ className = '', children, ...props }) => {
-  const classes = `rounded-lg border border-gray-200 bg-white text-gray-950 shadow-sm ${className}`;
+const Card: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className = '', children, ...props }) => {
+  const classes = `border border-gray-200 bg-white text-gray-950 shadow-sm ${poppins.className} ${className}`;
   
   return (
     <div className={classes} {...props}>
@@ -12,10 +16,8 @@ const Card: React.FC<CardProps> = ({ className = '', children, ...props }) => {
   );
 };
 
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const CardContent: React.FC<CardContentProps> = ({ className = '', children, ...props }) => {
-  const classes = `p-6 pt-0 ${className}`;
+const CardContent: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className = '', children, ...props }) => {
+  const classes = `p-6 pt-0 ${poppins.className} ${className}`;
   
   return (
     <div className={classes} {...props}>
