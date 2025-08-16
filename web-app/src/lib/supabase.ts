@@ -67,6 +67,21 @@ export async function updateOrderStatus(claimId: string, updates: Partial<Dreamp
   return data;
 }
 
+export async function getOrderByClaimId(claimId: string): Promise<DreamprintOrder | null> {
+  const { data, error } = await supabase
+    .from('dreamprint_orders')
+    .select('*')
+    .eq('claim_id', claimId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching order by claim ID:', error);
+    return null;
+  }
+
+  return data;
+}
+
 // Function to get all orders (for admin)
 export async function getAllOrders() {
   const { data, error } = await supabase

@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
-import { DreamprintOrder } from "@/lib/supabase";
+import { DreamprintOrder, getOrderByClaimId, updateOrderStatus } from "@/lib/supabase";
 
 export default function ClaimPage() {
   const params = useParams();
@@ -23,14 +23,13 @@ export default function ClaimPage() {
   const fetchOrderDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/orders/${claimId}`);
+      const order = await getOrderByClaimId(claimId);
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch order details');
+      if (!order) {
+        throw new Error('Order not found');
       }
       
-      const data = await response.json();
-      setOrder(data.order);
+      setOrder(order);
     } catch (err) {
       console.error("Error fetching order:", err);
       setError("Failed to load claim details");
@@ -46,16 +45,10 @@ export default function ClaimPage() {
       console.log(`Minting NFT for claim ${claimId}`);
       
       // Update mint status in database
-      const response = await fetch(`/api/orders/${claimId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ minted_status: true })
-      });
-
-      if (response.ok) {
-        // Refresh order data
-        await fetchOrderDetails();
-      }
+      await updateOrderStatus(claimId, { minted_status: true });
+      
+      // Refresh order data
+      await fetchOrderDetails();
     } catch (err) {
       console.error("Error minting NFT:", err);
       setError("Failed to mint NFT");
