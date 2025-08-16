@@ -96,7 +96,7 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
         }
       }, 1000); // Brief delay for "generating claim ID"
       
-    } catch (error: any) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error("Payment failed:", error);
       
       // Handle specific error types
