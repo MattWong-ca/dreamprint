@@ -46,33 +46,41 @@ export default function CollagePage() {
     }
   };
 
-  // Generate random positions for images around the center
+  // Generate positions with minimal overlap
   const generateImageStyle = (index: number, total: number) => {
     // Use a seeded random based on index for consistent positioning
     const seed = index * 1000;
-    const pseudoRandom1 = (Math.sin(seed) * 10000) % 1;
-    const pseudoRandom2 = (Math.sin(seed + 1) * 10000) % 1;
-    const pseudoRandom3 = (Math.sin(seed + 2) * 10000) % 1;
+    const pseudoRandom1 = Math.abs((Math.sin(seed) * 10000) % 1);
+    const pseudoRandom2 = Math.abs((Math.sin(seed + 1) * 10000) % 1);
+    const pseudoRandom3 = Math.abs((Math.sin(seed + 2) * 10000) % 1);
     
-    const angle = (index / total) * 2 * Math.PI;
-    const baseRadius = 25; // Base radius in viewport units
-    const centerX = 50; // 50% from left
-    const centerY = 50; // 50% from top
+    // Create a spiral pattern with multiple rings to prevent overlap
+    const ring = Math.floor(index / 8); // 8 images per ring
+    const positionInRing = index % 8;
+    const baseRadius = 30 + (ring * 12); // Start further out to avoid text, increase radius for each ring
     
-    // Add some randomness to make it look more natural
-    const randomRadius = baseRadius + pseudoRandom1 * 15;
-    const randomAngle = angle + (pseudoRandom2 - 0.5) * 0.8;
+    // Calculate angle with even spacing and some randomness
+    const baseAngle = (positionInRing / 8) * 2 * Math.PI;
+    const angleVariation = (pseudoRandom2 - 0.5) * 0.3; // Smaller variation
+    const angle = baseAngle + angleVariation;
     
-    const x = centerX + Math.cos(randomAngle) * randomRadius;
-    const y = centerY + Math.sin(randomAngle) * randomRadius;
+    // Add some radius variation but keep minimum distance to avoid text
+    const radiusVariation = (pseudoRandom1 - 0.5) * 8;
+    const radius = Math.max(baseRadius + radiusVariation, 28); // Minimum radius to clear center text
     
-    // Random rotation for polaroid effect
-    const rotation = (pseudoRandom3 - 0.5) * 40;
+    const centerX = 50;
+    const centerY = 50;
+    
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+    
+    // Smaller rotation to prevent too much overlap
+    const rotation = (pseudoRandom3 - 0.5) * 25;
     
     return {
       position: 'absolute' as const,
-      left: `${Math.max(5, Math.min(95, x))}%`,
-      top: `${Math.max(5, Math.min(95, y))}%`,
+      left: `${Math.max(8, Math.min(92, x))}%`,
+      top: `${Math.max(8, Math.min(92, y))}%`,
       transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
       zIndex: Math.floor(pseudoRandom1 * 10) + 1,
     };
