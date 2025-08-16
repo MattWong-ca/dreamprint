@@ -1,68 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import PYUSDPayment from "@/components/PYUSDPayment";
 
 export default function PayPage() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState("");
-  const [collageOptIn, setCollageOptIn] = useState(false);
   const [claimId, setClaimId] = useState("");
   const [hasPaid, setHasPaid] = useState(false);
-  const { primaryWallet } = useDynamicContext();
+  const [collageOptIn, setCollageOptIn] = useState(false);
 
-  const handlePayment = async () => {
-    if (!primaryWallet) {
-      alert("Please connect your wallet first");
-      return;
-    }
-
-    setIsLoading(true);
-    setLoadingMessage("Processing payment...");
-
-    try {
-      // Simulate payment transaction
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setLoadingMessage("Generating claim ID...");
-      
-      // Simulate claim ID generation
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const newClaimId = generateClaimId();
-      setClaimId(newClaimId);
-      
-      // Here you would send to Supabase:
-      // - claimId
-      // - wallet address (primaryWallet.address)
-      // - paid: true
-      // - collageOptIn
-      
-      console.log("Payment successful!", {
-        claimId: newClaimId,
-        wallet: primaryWallet.address,
-        paid: true,
-        collageOptIn
-      });
-      
-      // Reset loading state and mark as paid
-      setIsLoading(false);
-      setLoadingMessage("");
-      setHasPaid(true);
-      
-    } catch (error) {
-      console.error("Payment failed:", error);
-      setIsLoading(false);
-      setLoadingMessage("");
-      alert("Payment failed. Please try again.");
-    }
-  };
-
-  const generateClaimId = () => {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  const handlePaymentSuccess = (newClaimId: string) => {
+    setClaimId(newClaimId);
+    setHasPaid(true);
   };
 
   // Show confirmation page if payment is complete
@@ -84,14 +34,14 @@ export default function PayPage() {
                 <p className="text-gray-600 mb-6">
                   Show this claim ID to the photographer to receive your polaroid print
                 </p>
-              </div>
-              <div className="bg-gray-100 p-4 rounded mx-8">
-                <p className="text-sm text-gray-700">
-                  <strong>What happens next:</strong><br />
-                  • Take a photo with the photographer<br />
-                  • Choose your art style<br />
-                  • Watch it print, then mint it! 
-                </p>
+                <div className="bg-gray-100 p-4 rounded mx-8">
+                  <p className="text-sm text-gray-700">
+                    <strong>What happens next:</strong><br />
+                    • Take a photo with the photographer<br />
+                    • Choose your art style<br />
+                    • Watch it print, then mint it! 
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -139,22 +89,12 @@ export default function PayPage() {
               </label>
             </div>
 
-            <Button
-              onClick={handlePayment}
-              disabled={isLoading}
-              className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 text-lg disabled:opacity-50"
-            >
-              {isLoading ? loadingMessage : "Pay 1 PYUSD"}
-            </Button>
+            <PYUSDPayment 
+              onPaymentSuccess={handlePaymentSuccess}
+              collageOptIn={collageOptIn}
+            />
           </CardContent>
         </Card>
-
-        {isLoading && (
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
-            <p className="text-gray-600">{loadingMessage}</p>
-          </div>
-        )}
 
         <div className="text-center text-sm text-gray-500">
           <p>Payment processed onchain</p>

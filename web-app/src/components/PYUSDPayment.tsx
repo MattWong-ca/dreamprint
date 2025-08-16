@@ -1,0 +1,152 @@
+"use client";
+
+import { useState } from "react";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { Button } from "@/components/ui/button";
+import { parseUnits, erc20Abi } from 'viem';
+
+// Contract addresses
+const PYUSD_TOKEN_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
+const YOUR_WALLET_ADDRESS = "0xB68918211aD90462FbCf75b77a30bF76515422CE"; // Your wallet to receive PYUSD
+
+interface PYUSDPaymentProps {
+  onPaymentSuccess: (claimId: string) => void;
+  collageOptIn: boolean;
+}
+
+export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPaymentProps) {
+  const { primaryWallet } = useDynamicContext();
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "paying" | "success" | "error">("idle");
+  const [paymentHash, setPaymentHash] = useState<string>("");
+  const [loadingMessage, setLoadingMessage] = useState("");
+
+  const payPYUSD = async () => {
+    if (!primaryWallet) {
+      alert("Please connect your wallet first!");
+      return;
+    }
+
+    try {
+      setIsPaying(true);
+      setPaymentStatus("paying");
+      setPaymentHash("");
+      setLoadingMessage("Processing payment...");
+
+      const walletClient = await primaryWallet.getWalletClient();
+      
+      // 1 PYUSD = 1,000,000 wei (6 decimals)
+      const paymentAmount = parseUnits("1", 6); // 1 PYUSD with 6 decimals
+      
+      // Direct transfer to your wallet
+      const hash = await walletClient.writeContract({
+        address: PYUSD_TOKEN_ADDRESS as `0x${string}`,
+        abi: erc20Abi,
+        functionName: 'transfer',
+        args: [YOUR_WALLET_ADDRESS, paymentAmount],
+      });
+
+      setPaymentHash(hash);
+      setLoadingMessage("Generating claim ID...");
+      
+      // Simulate claim ID generation (replace with actual backend call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      const claimId = generateClaimId();
+      
+      setPaymentStatus("success");
+      setLoadingMessage("");
+      
+      // Call the success callback with the claim ID
+      onPaymentSuccess(claimId);
+      
+      console.log("Payment successful! Transaction hash:", hash);
+      console.log("Claim ID:", claimId);
+      console.log("PYUSD sent to:", YOUR_WALLET_ADDRESS);
+      
+    } catch (error) {
+      console.error("Payment failed:", error);
+      setPaymentStatus("error");
+      setLoadingMessage("");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
+  const generateClaimId = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+
+  const getButtonText = () => {
+    if (isPaying) return loadingMessage || "Processing...";
+    if (paymentStatus === "success") return "Payment Successful!";
+    return "Pay 1 PYUSD";
+  };
+
+  const getButtonClass = () => {
+    const baseClass = "w-full py-3 text-lg font-medium transition-colors ";
+    
+    if (paymentStatus === "success") {
+      return baseClass + "bg-green-500 text-white cursor-default";
+    } else if (paymentStatus === "error") {
+      return baseClass + "bg-red-500 text-white hover:bg-red-600";
+    } else if (isPaying) {
+      return baseClass + "bg-gray-400 text-white cursor-not-allowed";
+    } else {
+      return baseClass + "bg-pink-500 text-white hover:bg-pink-600";
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <Button
+        onClick={payPYUSD}
+        disabled={isPaying || paymentStatus === "success"}
+        className={getButtonClass()}
+      >
+        {getButtonText()}
+      </Button>
+
+      {/* Payment Status */}
+      {paymentStatus === "paying" && (
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+          <div className="text-blue-600 text-sm">{loadingMessage}</div>
+        </div>
+      )}
+
+      {paymentStatus === "success" && paymentHash && (
+        <div className="text-center">
+          <div className="text-green-600 text-sm mb-2">✅ Payment Successful!</div>
+          <a
+            href={`https://sepolia.etherscan.io/tx/${paymentHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 text-xs hover:underline"
+          >
+            View on Etherscan
+          </a>
+        </div>
+      )}
+
+      {paymentStatus === "error" && (
+        <div className="text-red-600 text-sm text-center">
+          Payment failed. Please try again.
+        </div>
+      )}
+
+      {/* Reset button after success */}
+      {paymentStatus === "success" && (
+        <Button
+          onClick={() => {
+            setPaymentStatus("idle");
+            setPaymentHash("");
+          }}
+          variant="outline"
+          className="w-full bg-transparent"
+        >
+          Make Another Payment
+        </Button>
+      )}
+    </div>
+  );
+}
