@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
@@ -7,11 +7,11 @@ const supabase = createClient(
 );
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { claimId: string, tokenId: string } }
+    req: Request,
+    { params }: { params: { claimId: string; tokenId: string } }
 ) {
   try {
-    const { claimId, tokenId } = context.params;
+    const { claimId, tokenId } = params;
 
     if (!claimId || !tokenId) {
       return NextResponse.json(
