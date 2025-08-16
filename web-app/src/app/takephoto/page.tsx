@@ -26,6 +26,7 @@ function TakePhotoContent() {
   const [currentStep, setCurrentStep] = useState<"photo" | "processing" | "qr" | "save">("photo");
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isProcessingAI, setIsProcessingAI] = useState(false);
+  const [isAddingQR, setIsAddingQR] = useState(false);
 
     useEffect(() => {
         if (claimId) {
@@ -168,7 +169,7 @@ function TakePhotoContent() {
             
             // Create prompt based on selected filter
             const promptMap = {
-                "Anime": "Transform this image into the style of Studio Ghibli.",
+                "Anime": "Convert this photo into a detailed Studio Ghibli style illustration. Use warm, natural colors, soft lighting, and painterly textures. The lines should be clean but not too sharp, with expressive eyes and subtle shading. Match the aesthetic of Ghibli films like Spirited Away or Whisper of the Heart. Avoid flat or comic-like filters — instead emphasize depth, warmth, and cinematic atmosphere, similar to promotional art or movie stills.",
                 "Graffiti": "Turn this into a vibrant street art mural with a bold graffiti style. Use thick black ink outlines, flat spray-paint color fills, and high-contrast shadows. Simplify facial features and clothing folds into clear shapes with sharp edges. Apply saturated, vibrant colors with crisp separation—no gradients or soft blending. Add subtle spray textures and urban wall background for authenticity. The overall look should feel like a large-scale graffiti mural painted with aerosol cans, comic-book energy, and vivid, punchy tones.", 
                 "Pop Art": "Transform this image into the style of Andy Warhol's pop art."
             };
@@ -248,6 +249,8 @@ function TakePhotoContent() {
 
     const handleUploadAndAddQR = async () => {
         try {
+            setIsAddingQR(true);
+            
             // First upload and save the AI-edited image
             await uploadAndSaveImage();
             
@@ -256,6 +259,8 @@ function TakePhotoContent() {
         } catch (error) {
             console.error("Error in upload and QR process:", error);
             setError('Failed to process image. Please try again.');
+        } finally {
+            setIsAddingQR(false);
         }
     };
 
@@ -556,15 +561,28 @@ function TakePhotoContent() {
                                     </div>
                                 )}
 
-                                {currentStep === "qr" && (
+                                {currentStep === "qr" && !isAddingQR && (
                                     <div className="space-y-3 mt-6">
                                         <Button
                                             onClick={handleUploadAndAddQR}
                                             variant="outline"
                                             className="w-full text-sm"
+                                            disabled={isAddingQR}
                                         >
                                             📱 Add QR Code
                                         </Button>
+                                    </div>
+                                )}
+
+                                {isAddingQR && (
+                                    <div className="flex flex-col items-center justify-center py-8">
+                                        <div className="text-center">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+                                            <h3 className="text-sm font-medium text-gray-700">Adding QR Code</h3>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Uploading image and generating QR code...
+                                            </p>
+                                        </div>
                                     </div>
                                 )}
 
