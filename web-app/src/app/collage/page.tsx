@@ -112,8 +112,32 @@ export default function CollagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden">
+    <div className="min-h-screen overflow-hidden" style={{
+      background: `
+        linear-gradient(45deg, #8B4513 1px, transparent 1px),
+        linear-gradient(-45deg, #8B4513 1px, transparent 1px),
+        linear-gradient(90deg, #CD853F 0.5px, transparent 0.5px),
+        linear-gradient(0deg, #CD853F 0.5px, transparent 0.5px),
+        #D2B48C
+      `,
+      backgroundSize: '20px 20px, 20px 20px, 10px 10px, 10px 10px',
+      backgroundPosition: '0 0, 0 0, 0 0, 0 0'
+    }}>
       <Navbar />
+      
+      {/* Cork Board Texture Overlay */}
+      <div 
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: `
+            radial-gradient(circle at 25% 25%, #A0522D 2px, transparent 2px),
+            radial-gradient(circle at 75% 75%, #8B4513 1.5px, transparent 1.5px),
+            radial-gradient(circle at 50% 10%, #CD853F 1px, transparent 1px),
+            radial-gradient(circle at 10% 90%, #A0522D 1.5px, transparent 1.5px)
+          `,
+          backgroundSize: '40px 40px, 35px 35px, 25px 25px, 45px 45px'
+        }}
+      />
       
       {/* Main Collage Container */}
       <div className="relative w-full h-screen">
@@ -125,9 +149,10 @@ export default function CollagePage() {
             className="text-6xl md:text-8xl font-bold text-center leading-tight absolute"
             style={{
               color: '#000000',
-              transform: 'translate(6px, 6px)',
+              transform: 'translate(8px, 8px)',
               zIndex: 1,
-              lineHeight: '0.9'
+              lineHeight: '0.9',
+              fontWeight: '900'
             }}
           >
             ETHGlobal<br />New York
@@ -137,7 +162,7 @@ export default function CollagePage() {
           <h1 
             className="text-6xl md:text-8xl font-bold text-center leading-tight relative"
             style={{
-              color: '#2D1810',
+              color: 'white',
               zIndex: 2,
               lineHeight: '0.9'
             }}
@@ -162,8 +187,8 @@ export default function CollagePage() {
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
-            <div className="text-xs text-gray-500 text-center mt-1 font-mono">
-              {image.claim_id}
+            <div className="h-6 mt-1">
+              {/* Empty space for polaroid bottom margin */}
             </div>
           </div>
         ))}
