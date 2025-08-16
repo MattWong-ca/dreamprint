@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -10,6 +11,7 @@ import { DreamprintOrder, getOrderByClaimId, updateOrderStatus } from "@/lib/sup
 export default function ClaimPage() {
   const params = useParams();
   const claimId = params.claimId as string;
+  const { primaryWallet } = useDynamicContext();
   const [order, setOrder] = useState<DreamprintOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -39,6 +41,25 @@ export default function ClaimPage() {
   };
 
   const handleMintNFT = async () => {
+    // Check if wallet is connected and matches
+    if (!primaryWallet?.address) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    if (!order) {
+      alert("Order not found");
+      return;
+    }
+
+    const connectedAddress = primaryWallet.address.toLowerCase();
+    const orderAddress = order.wallet_address.toLowerCase();
+    
+    if (connectedAddress !== orderAddress) {
+      alert("Connected wallet doesn't match the wallet that made this purchase");
+      return;
+    }
+
     try {
       setLoading(true);
       // TODO: Implement NFT minting logic
