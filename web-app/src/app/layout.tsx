@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { FlowWalletConnectors } from "@dynamic-labs/flow";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +26,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <DynamicContextProvider
+      settings={{
+        environmentId: "7bc7e59f-745d-487a-a9c5-f7fe34766e7a",
+        walletConnectors: [EthereumWalletConnectors,FlowWalletConnectors],
+      }}
+    >
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    </DynamicContextProvider>
   );
 }
