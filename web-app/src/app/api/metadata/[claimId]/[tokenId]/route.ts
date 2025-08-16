@@ -40,9 +40,9 @@ export async function GET(
     // Return NFT metadata
     return NextResponse.json({
       name: `Dreamprint #${tokenId}`,
-      description: `AI polaroid print from Dreamprint at ETHGlobal New York, August 2025. View at https://dreamprint.vercel.app/claim/${claimId}`,
+      description: `AI polaroid print from Dreamprint at ETHGlobal New York, August 2025.`,
       image: order.image_url,
-      external_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://dreamprint.com'}/claim/${claimId}`
+      external_url: `https://dreamprint.vercel.app/claim/${claimId}`
     });
 
   } catch (error: unknown) {
