@@ -66,3 +66,18 @@ export async function updateOrderStatus(claimId: string, updates: Partial<Dreamp
 
   return data;
 }
+
+// Function to get all orders (for admin)
+export async function getAllOrders() {
+  const { data, error } = await supabase
+    .from('dreamprint_orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching all orders:', error);
+    throw error;
+  }
+
+  return data;
+}
