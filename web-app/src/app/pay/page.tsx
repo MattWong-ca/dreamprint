@@ -26,7 +26,7 @@ export default function PayPage() {
         <div className="px-4 py-8 max-w-md mx-auto">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-3xl font-bold text-black mb-2">Payment Successful!</h1>
+            <h1 className="text-3xl font-bold text-black mb-2">Payment Submitted!</h1>
             <p className="text-sm text-gray-500">
               (we&apos;ll let you know if the{" "}
               <a 
