@@ -5,6 +5,7 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import { parseUnits, erc20Abi } from 'viem';
 import { insertOrder } from '@/lib/supabase';
+import { isEthereumWallet } from "@dynamic-labs/ethereum";
 
 // Contract addresses
 const PYUSD_TOKEN_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
@@ -23,9 +24,8 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
   const [loadingMessage, setLoadingMessage] = useState("");
 
   const payPYUSD = async () => {
-    if (!primaryWallet) {
-      alert("Please connect your wallet first!");
-      return;
+    if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
+      throw new Error('This wallet is not an Ethereum wallet');
     }
 
     try {
@@ -45,7 +45,6 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
         abi: erc20Abi,
         functionName: 'transfer',
         args: [YOUR_WALLET_ADDRESS, paymentAmount],
-        waitConfirmations: 1,
       });
 
       setPaymentHash(hash);
