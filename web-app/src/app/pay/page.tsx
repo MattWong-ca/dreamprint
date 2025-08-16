@@ -2,19 +2,60 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import PYUSDPayment from "@/components/PYUSDPayment";
+import { updateOrderStatus } from "@/lib/supabase";
 
 export default function PayPage() {
   const [claimId, setClaimId] = useState("");
   const [hasPaid, setHasPaid] = useState(false);
   const [collageOptIn, setCollageOptIn] = useState(false);
   const [transactionHash, setTransactionHash] = useState("");
+  const [shareLink, setShareLink] = useState("");
+  const [isSubmittingShare, setIsSubmittingShare] = useState(false);
+  const [shareSubmitted, setShareSubmitted] = useState(false);
 
   const handlePaymentSuccess = (newClaimId: string, txHash: string) => {
     setClaimId(newClaimId);
     setTransactionHash(txHash);
     setHasPaid(true);
+  };
+
+  const submitShareLink = async () => {
+    if (!shareLink.trim() || !claimId) {
+      alert("Please enter a valid share link");
+      return;
+    }
+
+    // Basic validation for X/Farcaster links
+    const isValidLink = shareLink.includes('x.com') || 
+                       shareLink.includes('twitter.com') || 
+                       shareLink.includes('farcaster') ||
+                       shareLink.includes('warpcast.com');
+    
+    if (!isValidLink) {
+      alert("Please enter a valid X or Farcaster share link");
+      return;
+    }
+
+    try {
+      setIsSubmittingShare(true);
+      
+      // Update the order with the tweet/share link
+      await updateOrderStatus(claimId, { 
+        tweet_link: shareLink.trim() 
+      });
+      
+      setShareSubmitted(true);
+      console.log("Share link submitted successfully:", shareLink);
+      
+    } catch (error) {
+      console.error("Error submitting share link:", error);
+      alert("Failed to submit share link. Please try again.");
+    } finally {
+      setIsSubmittingShare(false);
+    }
   };
 
   // Show confirmation page if payment is complete
@@ -59,6 +100,53 @@ export default function PayPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Share Link Section */}
+          {!shareSubmitted && (
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h3 className="text-lg font-bold text-black mt-8 mb-2">📱 Share on Social Media</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Share your photo to get your PYUSD back:
+                  </p>
+                  <div className="space-y-3">
+                    <input
+                      type="url"
+                      value={shareLink}
+                      onChange={(e) => setShareLink(e.target.value)}
+                      placeholder="Paste your X or Farcaster share link here..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+                      disabled={isSubmittingShare}
+                    />
+                    <Button
+                      onClick={submitShareLink}
+                      disabled={isSubmittingShare || !shareLink.trim()}
+                      className="w-full bg-blue-500 text-white hover:bg-blue-600"
+                    >
+                      {isSubmittingShare ? "Submitting..." : "Submit Share Link"}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Share Link Submitted Confirmation */}
+          {shareSubmitted && (
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <div className="text-green-600 text-lg font-bold mt-8 mb-2">
+                    ✅ Share Link Submitted!
+                  </div>
+                  <div className="text-green-500 text-sm">
+                    Thank you for sharing your Dreamprint experience!
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="text-center text-sm text-gray-500">
             <p>Thank you for using Dreamprint!</p>
