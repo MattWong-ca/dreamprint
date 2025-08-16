@@ -8,10 +8,10 @@ const supabase = createClient(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { claimId: string, tokenId: string } }
+  context: { params: { claimId: string, tokenId: string } }
 ) {
   try {
-    const { claimId, tokenId } = params;
+    const { claimId, tokenId } = context.params;
 
     if (!claimId || !tokenId) {
       return NextResponse.json(
@@ -40,7 +40,7 @@ export async function GET(
     // Return NFT metadata
     return NextResponse.json({
       name: `Dreamprint #${tokenId}`,
-      description: `AI-generated artwork from Dreamprint. View at ${process.env.NEXT_PUBLIC_SITE_URL || 'https://dreamprint.com'}/claim/${claimId}`,
+      description: `AI polaroid print from Dreamprint at ETHGlobal New York, August 2025. View at https://dreamprint.vercel.app/claim/${claimId}`,
       image: order.image_url,
       external_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://dreamprint.com'}/claim/${claimId}`
     });
