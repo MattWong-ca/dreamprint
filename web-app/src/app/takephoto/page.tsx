@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { updateOrderStatus, DreamprintOrder } from "@/lib/supabase";
 
 type FilterType = "Anime" | "Graffiti" | "Pop Art";
 
-export default function TakePhotoPage() {
+function TakePhotoContent() {
     const searchParams = useSearchParams();
     const claimId = searchParams.get('claimId');
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -23,8 +23,9 @@ export default function TakePhotoPage() {
       const [selectedFilter, setSelectedFilter] = useState<FilterType>("Anime");
   const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [currentStep, setCurrentStep] = useState<"photo" | "qr" | "save">("photo");
+  const [currentStep, setCurrentStep] = useState<"photo" | "processing" | "qr" | "save">("photo");
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [isProcessingAI, setIsProcessingAI] = useState(false);
 
     useEffect(() => {
         if (claimId) {
@@ -160,11 +161,51 @@ export default function TakePhotoPage() {
     };
 
     const handleAIEdit = async () => {
-        // TODO: Implement Replicate API call
-        console.log(`AI editing with ${selectedFilter} style`);
-        
-        // Move to QR code step
-        setCurrentStep("qr");
+        try {
+            setIsProcessingAI(true);
+            setCurrentStep("processing");
+            console.log(`AI editing with ${selectedFilter} style`);
+            
+            // Create prompt based on selected filter
+            const promptMap = {
+                "Anime": "Transform this image into anime/manga style with vibrant colors and clean lines",
+                "Graffiti": "Transform this image into street art graffiti style with bold colors and urban aesthetic", 
+                "Pop Art": "Transform this image into pop art style like Andy Warhol with bright colors and bold contrasts"
+            };
+            
+            const response = await fetch('/api/ai-edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    imageData: capturedImage,
+                    prompt: promptMap[selectedFilter]
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to process AI edit');
+            }
+
+            const result = await response.json();
+            console.log('AI edit result:', result);
+            
+            if (result.editedImageUrl) {
+                // Update the captured image with the AI-edited version
+                setCapturedImage(result.editedImageUrl);
+                // Move to QR code step
+                setCurrentStep("qr");
+            } else {
+                throw new Error('No edited image URL received');
+            }
+        } catch (error) {
+            console.error('Error during AI edit:', error);
+            setError('Failed to process AI edit. Please try again.');
+            setCurrentStep("photo"); // Go back to photo step on error
+        } finally {
+            setIsProcessingAI(false);
+        }
     };
 
     const handleAddQRCode = async () => {
@@ -341,17 +382,31 @@ export default function TakePhotoPage() {
                                     <div className="flex gap-2 mt-4">
                                         <Button
                                             onClick={handleAIEdit}
+                                            disabled={isProcessingAI}
                                             className="flex-[3] bg-pink-500 text-white hover:bg-pink-600 text-sm"
                                         >
-                                            ✨ AI Edit
+                                            {isProcessingAI ? "Processing..." : "✨ AI Edit"}
                                         </Button>
                                         <Button
                                             onClick={retakePhoto}
                                             variant="outline"
                                             className="flex-1 text-sm"
+                                            disabled={isProcessingAI}
                                         >
                                             🔄
                                         </Button>
+                                    </div>
+                                )}
+
+                                {currentStep === "processing" && (
+                                    <div className="space-y-4 mt-6">
+                                        <div className="text-center">
+                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+                                            <h3 className="text-sm font-medium text-gray-700">AI Processing</h3>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Transforming your photo with {selectedFilter} style...
+                                            </p>
+                                        </div>
                                     </div>
                                 )}
 
@@ -387,5 +442,23 @@ export default function TakePhotoPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function TakePhotoPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-gray-50">
+                <Navbar />
+                <div className="px-4 py-8 max-w-md mx-auto">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-2"></div>
+                        <div className="text-gray-500">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        }>
+            <TakePhotoContent />
+        </Suspense>
     );
 }
