@@ -19,10 +19,10 @@ export default function HomePage() {
       <section className="px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-black mb-6 leading-tight">
-            Make swag personalized, memorable, and onchain
+            Instant AI polaroid prints for crypto events
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Instant AI polaroid prints that transform crypto events from forgettable swag to unforgettable experiences
+            Instant Anime, Graffiti, and Pop Art prints that make your crypto events unforgettable!
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -118,23 +118,23 @@ export default function HomePage() {
       {/* Pricing Section */}
       <section className="px-6 py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-black mb-8">Simple, Transparent Pricing</h2>
-          <p className="text-xl text-gray-600 mb-12">90% cheaper than T-shirts with 10x the engagement</p>
+          <h2 className="text-4xl font-bold text-black mb-8">Simple Pricing</h2>
+          <p className="text-xl text-gray-600 mb-16">75% cheaper than T-shirts with 10x the engagement</p>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
             {/* Free Option - Highlighted */}
-            <Card className="relative border-2 border-pink-500 shadow-lg">
+            <Card className="relative border-2 border-pink-500 shadow-lg pt-8 flex flex-col">
               <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-pink-500 text-white px-4 py-1">
                 RECOMMENDED
               </Badge>
-              <CardContent className="p-8">
+              <CardContent className="p-8 flex flex-col flex-1">
                 <h3 className="text-2xl font-bold mb-4">Free</h3>
                 <div className="text-4xl font-bold text-pink-500 mb-6">
                   $0
                   <span className="text-lg text-gray-500 font-normal"> PYUSD</span>
                 </div>
-                <p className="text-gray-600 mb-6">
-                  Share on X or Farcaster and get your $1 PYUSD back instantly after submitting your link
+                <p className="text-gray-600 mb-8">
+                  Pay for a photo, share it, and get your money back
                 </p>
                 <ul className="text-left space-y-3 mb-8">
                   <li className="flex items-center">
@@ -154,46 +154,40 @@ export default function HomePage() {
                     Onchain verification
                   </li>
                 </ul>
-                <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">Start Free</Button>
+                <div className="mt-auto">
+                  <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">Try now</Button>
+                </div>
               </CardContent>
             </Card>
 
             {/* Paid Option */}
-            <Card>
-              <CardContent className="p-8">
+            <Card className="pt-8 flex flex-col">
+              <CardContent className="p-8 flex flex-col flex-1">
                 <h3 className="text-2xl font-bold mb-4">Standard</h3>
                 <div className="text-4xl font-bold text-black mb-6">
                   $1
                   <span className="text-lg text-gray-500 font-normal"> PYUSD</span>
                 </div>
-                <p className="text-gray-600 mb-6">Perfect for those who prefer not to share on social media</p>
+                <p className="text-gray-600 mb-8">For those who prefer not to share on social media</p>
                 <ul className="text-left space-y-3 mb-8">
+                  
                   <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    AI-generated polaroid
+                    <span className="text-red-500 mr-2">✗</span>
+                    $1 more expensive
                   </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    Instant Fujifilm print
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    No sharing required
-                  </li>
-                  <li className="flex items-center">
-                    <span className="text-green-500 mr-2">✓</span>
-                    Onchain verification
-                  </li>
+                 
                 </ul>
-                <Button variant="outline" className="w-full bg-transparent">
-                  Get Started
-                </Button>
+                <div className="mt-auto">
+                  <Button variant="outline" className="w-full bg-transparent">
+                    Get Started
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
 
           <p className="text-sm text-gray-500 mt-8">
-            * For sponsors: 500 pieces cost 90% less than T-shirts while providing live UX feedback and measurable
+            * For sponsors: 500 pieces cost 75% less than T-shirts, while providing live UX feedback and measurable
             onchain engagement
           </p>
         </div>
@@ -203,18 +197,7 @@ export default function HomePage() {
       <footer className="bg-black text-white px-6 py-12">
         <div className="max-w-6xl mx-auto text-center">
           <div className="text-2xl font-semibold mb-4">Dreamprint</div>
-          <p className="text-gray-400 mb-8">Making crypto events memorable, one polaroid at a time</p>
-          <div className="flex justify-center space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white">
-              Twitter
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
-              Farcaster
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
-              Discord
-            </a>
-          </div>
+          <p className="text-gray-400 mb-8">Making your crypto events unforgettable, one polaroid at a time</p>
         </div>
       </footer>
     </div>
