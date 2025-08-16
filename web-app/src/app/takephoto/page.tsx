@@ -98,43 +98,47 @@ export default function TakePhotoPage() {
              const canvas = canvasRef.current;
              const context = canvas.getContext('2d');
 
-             // Set canvas dimensions for polaroid format (3:4 aspect ratio, taller)
-             const targetWidth = 600;
-             const targetHeight = 800;
-             canvas.width = targetWidth;
-             canvas.height = targetHeight;
-
              if (context) {
-                 // Clear canvas
+                 // Use higher resolution canvas for better quality
+                 const targetWidth = 2400;  // Double the display resolution
+                 const targetHeight = 3200; // Double the display resolution
+                 canvas.width = targetWidth;
+                 canvas.height = targetHeight;
+
+                 // Enable high-quality rendering
+                 context.imageSmoothingEnabled = true;
+                 context.imageSmoothingQuality = 'high';
+                 
+                 // Clear canvas with black background
                  context.fillStyle = '#000000';
                  context.fillRect(0, 0, canvas.width, canvas.height);
                  
-                 // Calculate scaling to fit video into polaroid dimensions
+                 // Calculate scaling to fit video into polaroid dimensions while maintaining quality
                  const videoAspect = video.videoWidth / video.videoHeight;
                  const targetAspect = targetWidth / targetHeight;
                  
                  let drawWidth, drawHeight, offsetX, offsetY;
                  
                  if (videoAspect > targetAspect) {
-                     // Video is wider, fit to height
+                     // Video is wider, fit to height and crop sides
                      drawHeight = targetHeight;
                      drawWidth = drawHeight * videoAspect;
                      offsetX = (targetWidth - drawWidth) / 2;
                      offsetY = 0;
                  } else {
-                     // Video is taller, fit to width
+                     // Video is taller, fit to width and crop top/bottom
                      drawWidth = targetWidth;
                      drawHeight = drawWidth / videoAspect;
                      offsetX = 0;
                      offsetY = (targetHeight - drawHeight) / 2;
                  }
 
-                 // Draw the image normally (no mirroring)
+                 // Draw the video frame at full resolution
                  context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
              }
 
-             // Convert to data URL for display and storage
-             const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+             // Convert to PNG for lossless quality, or high-quality JPEG
+             const imageDataUrl = canvas.toDataURL('image/png');
              setCapturedImage(imageDataUrl);
              setPhotoTaken(true);
 
