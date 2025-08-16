@@ -210,23 +210,86 @@ function TakePhotoContent() {
 
     const handleAddQRCode = async () => {
         try {
-            // Step 1: Upload image to hosting API
-            console.log("Uploading image to hosting service...");
-            // TODO: Implement image hosting API call
-            const hostedImageUrl = `https://example.com/hosted/${claimId}.png`;
+            // Step 1: Generate QR code URL
+            const claimUrl = `${window.location.origin}/claim/${claimId}`;
+            console.log("Generating QR code for:", claimUrl);
+            
+            // Step 2: Create canvas to overlay QR code on image
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (!ctx) {
+                throw new Error('Could not get canvas context');
+            }
+            
+            // Create image element from captured image
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            
+            await new Promise((resolve, reject) => {
+                img.onload = async () => {
+                    try {
+                        // Set canvas dimensions to match image
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        
+                        // Draw the original image
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Generate QR code using a simple QR API service
+                        const qrSize = Math.min(img.width, img.height) * 0.18; // 18% of image size
+                        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${Math.floor(qrSize)}x${Math.floor(qrSize)}&data=${encodeURIComponent(claimUrl)}&bgcolor=255-255-255&color=0-0-0&format=png`;
+                        
+                        // Load QR code image
+                        const qrImg = new Image();
+                        qrImg.crossOrigin = 'anonymous';
+                        
+                        qrImg.onload = () => {
+                            // Position QR code at bottom right corner with padding
+                            const padding = 30;
+                            const qrX = img.width - qrSize - padding;
+                            const qrY = img.height - qrSize - 45;
+                            
+                            // Add white background for QR code
+                            ctx.fillStyle = 'white';
+                            ctx.fillRect(qrX - padding/2, qrY - padding/2, qrSize + padding, qrSize + padding);
+                            
+                            // Draw QR code
+                            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                            
+                            // Convert canvas to data URL
+                            const finalImageUrl = canvas.toDataURL('image/png', 0.9);
+                            setCapturedImage(finalImageUrl);
+                            
+                            resolve(true);
+                        };
+                        
+                        qrImg.onerror = () => reject(new Error('Failed to load QR code'));
+                        qrImg.src = qrUrl;
+                        
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = capturedImage;
+            });
+            
+            // Step 3: Upload final image to hosting API
+            console.log("Uploading final image to hosting service...");
+            // TODO: Implement image hosting API call with final image
+            const hostedImageUrl = `https://example.com/hosted/${claimId}-final.png`;
             setImageUrl(hostedImageUrl);
             
-            // Step 2: Save image URL to database
+            // Step 4: Save image URL to database
             console.log("Saving image URL to database...");
             // TODO: Implement database update with hosted URL
-            
-            // Step 3: Generate and add QR code to image
-            console.log("Adding QR code to image...");
-            // TODO: Implement QR code generation and overlay on image
             
             setCurrentStep("save");
         } catch (error) {
             console.error("Error in QR code process:", error);
+            setError('Failed to add QR code. Please try again.');
         }
     };
 

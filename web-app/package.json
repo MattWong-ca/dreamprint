@@ -13,8 +13,10 @@
     "@dynamic-labs/flow": "^4.26.0",
     "@dynamic-labs/sdk-react-core": "^4.26.0",
     "@supabase/supabase-js": "^2.55.0",
+    "@types/qrcode": "^1.5.5",
     "crypto-browserify": "^3.12.1",
     "next": "15.4.6",
+    "qrcode": "^1.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "replicate": "^1.0.1"
