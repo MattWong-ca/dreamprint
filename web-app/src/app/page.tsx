@@ -20,9 +20,11 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button size="lg" className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 text-lg">
-              Get Started →
-            </Button>
+            <Link href="/pay">
+              <Button size="lg" className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 text-lg">
+                Get Started →
+              </Button>
+            </Link>
             <Button variant="outline" size="lg" className="px-8 py-3 text-lg bg-transparent">
               View Demo →
             </Button>
