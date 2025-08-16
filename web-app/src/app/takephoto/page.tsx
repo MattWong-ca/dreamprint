@@ -350,22 +350,55 @@ function TakePhotoContent() {
     };
 
     const saveToPhotos = () => {
-        if (capturedImage) {
-            // Create download link
-            const link = document.createElement('a');
-            link.download = `dreamprint-${claimId}.jpg`;
-            link.href = capturedImage;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        if (!capturedImage) return;
+        
+        // For iOS Safari, try to use Web Share API first
+        if (navigator.share && /iPad|iPhone|iPod/.test(navigator.userAgent)) {
+            // Convert data URL to blob for sharing
+            fetch(capturedImage)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], `dreamprint-${claimId}.jpg`, { type: 'image/jpeg' });
+                    
+                    navigator.share({
+                        title: 'Dreamprint Artwork',
+                        files: [file]
+                    }).catch(err => {
+                        console.log('Share failed, falling back to download:', err);
+                        fallbackDownload();
+                    });
+                })
+                .catch(err => {
+                    console.log('Blob conversion failed, falling back to download:', err);
+                    fallbackDownload();
+                });
+        } else {
+            // For other browsers, use download
+            fallbackDownload();
         }
     };
 
-    const generateQRCode = () => {
-        // Placeholder for QR code generation
-        const qrData = `https://dreamprint.app/claim/${claimId}`;
-        console.log("Generate QR code for:", qrData);
-        alert(`QR Code data: ${qrData}`);
+    const fallbackDownload = () => {
+        if (!capturedImage) return;
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.href = capturedImage;
+        link.download = `dreamprint-${claimId}.jpg`;
+        link.target = '_blank';
+        
+        // For mobile devices, try to trigger download
+        if (link.download !== undefined) {
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // Fallback for older browsers
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`<img src="${capturedImage}" alt="Dreamprint artwork" />`);
+            }
+        }
     };
 
     const handleCompleteOrder = async () => {
