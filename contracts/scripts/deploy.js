@@ -1,5 +1,7 @@
 const hre = require("hardhat");
 
+// Deployed Sepolia address: 0xEe0B75F278255aB56CCF84E36361bCbC3822EE15
+
 async function main() {
   console.log("Deploying PYUSDPayment contract...");
 
