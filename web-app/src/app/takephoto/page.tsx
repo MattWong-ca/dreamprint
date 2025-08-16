@@ -168,9 +168,9 @@ function TakePhotoContent() {
             
             // Create prompt based on selected filter
             const promptMap = {
-                "Anime": "Transform this image into anime/manga style with vibrant colors and clean lines",
-                "Graffiti": "Transform this image into street art graffiti style with bold colors and urban aesthetic", 
-                "Pop Art": "Transform this image into pop art style like Andy Warhol with bright colors and bold contrasts"
+                "Anime": "Transform this image into the style of Studio Ghibli.",
+                "Graffiti": "Turn this into a vibrant street art mural with a bold graffiti style. Use thick black ink outlines, flat spray-paint color fills, and high-contrast shadows. Simplify facial features and clothing folds into clear shapes with sharp edges. Apply saturated, vibrant colors with crisp separation—no gradients or soft blending. Add subtle spray textures and urban wall background for authenticity. The overall look should feel like a large-scale graffiti mural painted with aerosol cans, comic-book energy, and vivid, punchy tones.", 
+                "Pop Art": "Transform this image into the style of Andy Warhol's pop art."
             };
             
             const response = await fetch('/api/ai-edit', {
