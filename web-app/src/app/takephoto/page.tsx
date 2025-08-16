@@ -208,6 +208,57 @@ function TakePhotoContent() {
         }
     };
 
+    const uploadAndSaveImage = async () => {
+        try {
+            console.log("Uploading AI-edited image to Cloudinary...");
+            
+            // Step 1: Upload AI-edited image to Cloudinary
+            const uploadResponse = await fetch('/api/upload-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    imageUrl: capturedImage, // This is the Replicate result URL
+                    claimId: claimId
+                })
+            });
+
+            if (!uploadResponse.ok) {
+                throw new Error('Failed to upload image to Cloudinary');
+            }
+
+            const uploadResult = await uploadResponse.json();
+            const permanentUrl = uploadResult.imageUrl;
+            
+            console.log("Image uploaded to Cloudinary:", permanentUrl);
+            setImageUrl(permanentUrl);
+            
+            // Step 2: Save permanent URL to Supabase
+            console.log("Saving image URL to Supabase...");
+            await updateOrderStatus(claimId!, {
+                image_url: permanentUrl,
+                minted_status: false // Will be set to true after QR code is added
+            });
+            
+            return permanentUrl;
+        } catch (error) {
+            console.error("Error uploading and saving image:", error);
+            throw new Error('Failed to upload and save image');
+        }
+    };
+
+    const handleUploadAndAddQR = async () => {
+        try {
+            // First upload and save the AI-edited image
+            await uploadAndSaveImage();
+            
+            // Then add QR code
+            await handleAddQRCode();
+        } catch (error) {
+            console.error("Error in upload and QR process:", error);
+            setError('Failed to process image. Please try again.');
+        }
+    };
+
     const handleAddQRCode = async () => {
         try {
             // Step 1: Generate QR code URL
@@ -476,7 +527,7 @@ function TakePhotoContent() {
                                 {currentStep === "qr" && (
                                     <div className="space-y-3 mt-6">
                                         <Button
-                                            onClick={handleAddQRCode}
+                                            onClick={handleUploadAndAddQR}
                                             variant="outline"
                                             className="w-full text-sm"
                                         >
