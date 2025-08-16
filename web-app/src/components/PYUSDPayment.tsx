@@ -4,13 +4,20 @@ import { useState } from "react";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import { parseUnits, erc20Abi } from 'viem';
+import { insertOrder } from '@/lib/supabase';
+import { createPublicClient, http } from 'viem'
+import { sepolia } from "viem/chains";
 
 // Contract addresses
 const PYUSD_TOKEN_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
 const YOUR_WALLET_ADDRESS = "0xB68918211aD90462FbCf75b77a30bF76515422CE"; // Your wallet to receive PYUSD
 
+const publicClient = createPublicClient({
+  chain: sepolia,
+  transport: http(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`), // <-- must pass RPC
+})
 interface PYUSDPaymentProps {
-  onPaymentSuccess: (claimId: string) => void;
+  onPaymentSuccess: (claimId: string, transactionHash: string) => void;
   collageOptIn: boolean;
 }
 
@@ -44,29 +51,83 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
         abi: erc20Abi,
         functionName: 'transfer',
         args: [YOUR_WALLET_ADDRESS, paymentAmount],
+        waitConfirmations: 1,
       });
 
       setPaymentHash(hash);
-      setLoadingMessage("Generating claim ID...");
       
-      // Simulate claim ID generation (replace with actual backend call)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const claimId = generateClaimId();
+      // Step 1: Transaction submitted - show "submitted" message immediately
+      setLoadingMessage("Transaction submitted! You'll be notified if it fails.");
       
-      setPaymentStatus("success");
-      setLoadingMessage("");
+      // Step 2: Brief "generating claim ID" (very quick)
+      setTimeout(() => {
+        setLoadingMessage("Generating claim ID...");
+      }, 500);
       
-      // Call the success callback with the claim ID
-      onPaymentSuccess(claimId);
+      // Generate claim ID after brief delay
+      setTimeout(async () => {
+        const claimId = generateClaimId();
+        console.log("Claim ID:", claimId);
+        
+        // Step 3: Recording order - this is the main loading time
+        setLoadingMessage("Recording order...");
+        
+        try {
+          await insertOrder({
+            claim_id: claimId,
+            wallet_address: primaryWallet.address,
+            paid: true,
+            collage_opt_in: collageOptIn,
+            tweet_link: undefined,
+            minted_status: false,
+            image_url: undefined
+          });
+          
+          console.log("Order recorded in Supabase successfully!");
+          
+          // Step 4: Only NOW show success and move to success page
+          setPaymentStatus("success");
+          setLoadingMessage("");
+          onPaymentSuccess(claimId, hash);
+          
+          console.log("Payment successful! Transaction hash:", hash);
+          console.log("PYUSD sent to:", YOUR_WALLET_ADDRESS);
+          
+        } catch (dbError) {
+          console.error("Failed to record order in database:", dbError);
+          // Still show success even if DB fails
+          setPaymentStatus("success");
+          setLoadingMessage("");
+          onPaymentSuccess(claimId, hash);
+        }
+      }, 1000); // Brief delay for "generating claim ID"
       
-      console.log("Payment successful! Transaction hash:", hash);
-      console.log("Claim ID:", claimId);
-      console.log("PYUSD sent to:", YOUR_WALLET_ADDRESS);
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment failed:", error);
+      
+      // Handle specific error types
+      let errorMessage = "Payment failed. Please try again.";
+      
+      if (error.code === 'INSUFFICIENT_FUNDS') {
+        errorMessage = "Insufficient PYUSD balance. Please check your wallet.";
+      } else if (error.code === 'USER_REJECTED') {
+        errorMessage = "Transaction was cancelled by user.";
+      } else if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {
+        errorMessage = "Transaction failed due to gas issues. Please try again.";
+      } else if (error.message?.includes('insufficient funds')) {
+        errorMessage = "Insufficient PYUSD balance. Please check your wallet.";
+      } else if (error.message?.includes('user rejected')) {
+        errorMessage = "Transaction was cancelled by user.";
+      } else if (error.message?.includes('gas')) {
+        errorMessage = "Transaction failed due to gas issues. Please try again.";
+      }
+      
       setPaymentStatus("error");
       setLoadingMessage("");
+      
+      // Show user-friendly error message
+      alert(errorMessage);
+      
     } finally {
       setIsPaying(false);
     }
@@ -78,7 +139,7 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
 
   const getButtonText = () => {
     if (isPaying) return loadingMessage || "Processing...";
-    if (paymentStatus === "success") return "Payment Successful!";
+    if (paymentStatus === "success") return "Payment Submitted!";
     return "Pay 1 PYUSD";
   };
 
@@ -116,15 +177,18 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
 
       {paymentStatus === "success" && paymentHash && (
         <div className="text-center">
-          <div className="text-green-600 text-sm mb-2">✅ Payment Successful!</div>
+          <div className="text-green-600 text-sm mb-2">✅ Payment Submitted!</div>
           <a
             href={`https://sepolia.etherscan.io/tx/${paymentHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500 text-xs hover:underline"
+            className="text-blue-500 text-xs hover:underline block mb-2"
           >
             View on Etherscan
           </a>
+          <div className="text-gray-500 text-xs">
+            You&apos;ll be notified if the transaction fails
+          </div>
         </div>
       )}
 

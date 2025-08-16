@@ -9,9 +9,11 @@ export default function PayPage() {
   const [claimId, setClaimId] = useState("");
   const [hasPaid, setHasPaid] = useState(false);
   const [collageOptIn, setCollageOptIn] = useState(false);
+  const [transactionHash, setTransactionHash] = useState("");
 
-  const handlePaymentSuccess = (newClaimId: string) => {
+  const handlePaymentSuccess = (newClaimId: string, txHash: string) => {
     setClaimId(newClaimId);
+    setTransactionHash(txHash);
     setHasPaid(true);
   };
 
@@ -25,6 +27,18 @@ export default function PayPage() {
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">🎉</div>
             <h1 className="text-3xl font-bold text-black mb-2">Payment Successful!</h1>
+            <p className="text-sm text-gray-500">
+              (we'll let you know if the{" "}
+              <a 
+                href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                transaction
+              </a>
+              {" "}fails)
+            </p>
           </div>
 
           <Card className="mb-6">
