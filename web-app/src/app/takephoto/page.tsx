@@ -20,9 +20,11 @@ export default function TakePhotoPage() {
     const [error, setError] = useState("");
     const [photoTaken, setPhotoTaken] = useState(false);
     const [capturedImage, setCapturedImage] = useState<string>("");
-    const [selectedFilter, setSelectedFilter] = useState<FilterType>("Anime");
-    const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
-    const [stream, setStream] = useState<MediaStream | null>(null);
+      const [selectedFilter, setSelectedFilter] = useState<FilterType>("Anime");
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [currentStep, setCurrentStep] = useState<"photo" | "qr" | "save">("photo");
+  const [imageUrl, setImageUrl] = useState<string>("");
 
     useEffect(() => {
         if (claimId) {
@@ -152,7 +154,44 @@ export default function TakePhotoPage() {
     const retakePhoto = () => {
         setPhotoTaken(false);
         setCapturedImage("");
+        setCurrentStep("photo");
+        setImageUrl("");
         startCamera();
+    };
+
+    const handleAIEdit = async () => {
+        // TODO: Implement Replicate API call
+        console.log(`AI editing with ${selectedFilter} style`);
+        
+        // Move to QR code step
+        setCurrentStep("qr");
+    };
+
+    const handleAddQRCode = async () => {
+        try {
+            // Step 1: Upload image to hosting API
+            console.log("Uploading image to hosting service...");
+            // TODO: Implement image hosting API call
+            const hostedImageUrl = `https://example.com/hosted/${claimId}.png`;
+            setImageUrl(hostedImageUrl);
+            
+            // Step 2: Save image URL to database
+            console.log("Saving image URL to database...");
+            // TODO: Implement database update with hosted URL
+            
+            // Step 3: Generate and add QR code to image
+            console.log("Adding QR code to image...");
+            // TODO: Implement QR code generation and overlay on image
+            
+            setCurrentStep("save");
+        } catch (error) {
+            console.error("Error in QR code process:", error);
+        }
+    };
+
+    const handleFinalSave = () => {
+        saveToPhotos();
+        handleCompleteOrder();
     };
 
     const saveToPhotos = () => {
@@ -297,38 +336,47 @@ export default function TakePhotoPage() {
                                     </div>
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="grid grid-cols-2 gap-2">
-                                    <Button
-                                        onClick={retakePhoto}
-                                        variant="outline"
-                                        className="text-sm"
-                                    >
-                                        🔄 New Photo
-                                    </Button>
-                                    <Button
-                                        onClick={saveToPhotos}
-                                        variant="outline"
-                                        className="text-sm"
-                                    >
-                                        💾 Save
-                                    </Button>
-                                </div>
+                                {/* Step-by-step flow */}
+                                {currentStep === "photo" && (
+                                    <div className="flex gap-2 mt-4">
+                                        <Button
+                                            onClick={handleAIEdit}
+                                            className="flex-[3] bg-pink-500 text-white hover:bg-pink-600 text-sm"
+                                        >
+                                            ✨ AI Edit
+                                        </Button>
+                                        <Button
+                                            onClick={retakePhoto}
+                                            variant="outline"
+                                            className="flex-1 text-sm"
+                                        >
+                                            🔄
+                                        </Button>
+                                    </div>
+                                )}
 
-                                <Button
-                                    onClick={generateQRCode}
-                                    variant="outline"
-                                    className="w-full text-sm"
-                                >
-                                    📱 Add QR Code
-                                </Button>
+                                {currentStep === "qr" && (
+                                    <div className="space-y-3 mt-6">
+                                        <Button
+                                            onClick={handleAddQRCode}
+                                            variant="outline"
+                                            className="w-full text-sm"
+                                        >
+                                            📱 Add QR Code
+                                        </Button>
+                                    </div>
+                                )}
 
-                                <Button
-                                    onClick={handleCompleteOrder}
-                                    className="w-full bg-green-500 text-white hover:bg-green-600"
-                                >
-                                    ✨ Complete Order ({selectedFilter})
-                                </Button>
+                                {currentStep === "save" && (
+                                    <div className="space-y-3 mt-6">
+                                        <Button
+                                            onClick={handleFinalSave}
+                                            className="w-full bg-green-500 text-white hover:bg-green-600"
+                                        >
+                                            💾 Save Photo
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </CardContent>
