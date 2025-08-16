@@ -10,6 +10,8 @@ export default function PayPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [collageOptIn, setCollageOptIn] = useState(false);
+  const [claimId, setClaimId] = useState("");
+  const [hasPaid, setHasPaid] = useState(false);
   const { primaryWallet } = useDynamicContext();
 
   const handlePayment = async () => {
@@ -30,7 +32,8 @@ export default function PayPage() {
       // Simulate claim ID generation
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const claimId = generateClaimId();
+      const newClaimId = generateClaimId();
+      setClaimId(newClaimId);
       
       // Here you would send to Supabase:
       // - claimId
@@ -39,18 +42,16 @@ export default function PayPage() {
       // - collageOptIn
       
       console.log("Payment successful!", {
-        claimId,
+        claimId: newClaimId,
         wallet: primaryWallet.address,
         paid: true,
         collageOptIn
       });
       
-      // Reset loading state
+      // Reset loading state and mark as paid
       setIsLoading(false);
       setLoadingMessage("");
-      
-      // Redirect or show success message
-      alert(`Payment successful! Your claim ID is: ${claimId}`);
+      setHasPaid(true);
       
     } catch (error) {
       console.error("Payment failed:", error);
@@ -63,6 +64,45 @@ export default function PayPage() {
   const generateClaimId = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
   };
+
+  // Show confirmation page if payment is complete
+  if (hasPaid) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        
+        <div className="px-4 py-8 max-w-md mx-auto">
+          <div className="text-center mb-8">
+            <div className="text-6xl mb-4">🎉</div>
+            <h1 className="text-3xl font-bold text-black mb-2">Payment Successful!</h1>
+          </div>
+
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-pink-500 mb-4 mt-8">Claim ID: {claimId}</div>
+                <p className="text-gray-600 mb-6">
+                  Show this claim ID to the photographer to receive your polaroid print
+                </p>
+              </div>
+              <div className="bg-gray-100 p-4 rounded mx-8">
+                <p className="text-sm text-gray-700">
+                  <strong>What happens next:</strong><br />
+                  • Take a photo with the photographer<br />
+                  • Choose your art style<br />
+                  • Watch it print, then mint it! 
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center text-sm text-gray-500">
+            <p>Thank you for using Dreamprint!</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,7 +132,7 @@ export default function PayPage() {
                 <div>
                   <div className="font-medium text-black">Opt in to collage</div>
                   <div className="text-sm text-gray-600 mt-1">
-                    Allow your polaroid to be featured in our community collage. 
+                    Allow your photo to be featured in our community collage. 
                     Sponsors may share this on socials!
                   </div>
                 </div>
