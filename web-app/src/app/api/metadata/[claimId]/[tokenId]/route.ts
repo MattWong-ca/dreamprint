@@ -42,7 +42,7 @@ export async function GET(
       name: `Dreamprint #${tokenId}`,
       description: `AI polaroid print from Dreamprint at ETHGlobal New York, August 2025.`,
       image: order.image_url,
-      external_url: `https://dreamprint.vercel.app/claim/${claimId}`
+      external_url: `https://dreamprint.app/claim/${claimId}`
     });
 
   } catch (error: unknown) {

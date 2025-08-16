@@ -5,7 +5,7 @@ async function main() {
 
   // Your web app's base URL for metadata API
   // This should match your deployed web app URL
-  const BASE_METADATA_URI = "https://dreamprint.vercel.app";
+  const BASE_METADATA_URI = "https://dreamprint.app";
   
   console.log("Base Metadata URI:", BASE_METADATA_URI);
   
