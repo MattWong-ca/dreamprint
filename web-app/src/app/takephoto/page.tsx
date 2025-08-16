@@ -327,15 +327,15 @@ function TakePhotoContent() {
                 img.src = capturedImage;
             });
             
-            // Step 3: Upload final image to hosting API
-            console.log("Uploading final image to hosting service...");
-            // TODO: Implement image hosting API call with final image
-            const hostedImageUrl = `https://example.com/hosted/${claimId}-final.png`;
-            setImageUrl(hostedImageUrl);
+            // // Step 3: Upload final image to hosting API
+            // console.log("Uploading final image to hosting service...");
+            // // TODO: Implement image hosting API call with final image
+            // const hostedImageUrl = `https://example.com/hosted/${claimId}-final.png`;
+            // setImageUrl(hostedImageUrl);
             
-            // Step 4: Save image URL to database
-            console.log("Saving image URL to database...");
-            // TODO: Implement database update with hosted URL
+            // // Step 4: Save image URL to database
+            // console.log("Saving image URL to database...");
+            // // TODO: Implement database update with hosted URL
             
             setCurrentStep("save");
         } catch (error) {
@@ -344,10 +344,10 @@ function TakePhotoContent() {
         }
     };
 
-    const handleFinalSave = () => {
-        saveToPhotos();
-        handleCompleteOrder();
-    };
+    // const handleFinalSave = () => {
+    //     saveToPhotos();
+    //     // handleCompleteOrder();
+    // };
 
     const saveToPhotos = () => {
         if (!capturedImage) return;
@@ -401,23 +401,22 @@ function TakePhotoContent() {
         }
     };
 
-    const handleCompleteOrder = async () => {
-        if (!claimId) return;
+    // const handleCompleteOrder = async () => {
+    //     if (!claimId) return;
 
-        try {
-            // Update the order status to minted
-            await updateOrderStatus(claimId, {
-                minted_status: true,
-                image_url: `https://example.com/images/${claimId}.jpg` // Placeholder URL
-            });
+    //     try {
+    //         // Update the order status to minted
+    //         await updateOrderStatus(claimId, {
+    //             minted_status: true,
+    //             image_url: `https://example.com/images/${claimId}.jpg` // Placeholder URL
+    //         });
 
-            console.log(`Order ${claimId} marked as complete`);
-            alert("Order completed successfully!");
-        } catch (err) {
-            console.error("Failed to complete order:", err);
-            alert("Failed to complete order");
-        }
-    };
+    //         console.log(`Order ${claimId} marked as complete`);
+    //     } catch (err) {
+    //         console.error("Failed to complete order:", err);
+    //         alert("Failed to complete order");
+    //     }
+    // };
 
     if (loading) {
         return (
@@ -572,7 +571,7 @@ function TakePhotoContent() {
                                 {currentStep === "save" && (
                                     <div className="space-y-3 mt-6">
                                         <Button
-                                            onClick={handleFinalSave}
+                                            onClick={saveToPhotos}
                                             className="w-full bg-green-500 text-white hover:bg-green-600"
                                         >
                                             💾 Save Photo

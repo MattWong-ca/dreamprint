@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { getNetwork, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { DreamprintOrder, getOrderByClaimId, updateOrderStatus } from "@/lib/supabase";
+import { abi } from "@/app/utils/nft-abi.json";
+import { isEthereumWallet } from "@dynamic-labs/ethereum";
+
+// Flow EVM testnet - 0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e
+const CONTRACT_ADDRESS = "0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e" as `0x${string}`;
 
 export default function ClaimPage() {
   const params = useParams();
@@ -15,6 +20,25 @@ export default function ClaimPage() {
   const [order, setOrder] = useState<DreamprintOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [transactionHash, setTransactionHash] = useState<string>("");
+
+  useEffect(() => {
+    const checkNetwork = async () => {
+      if (primaryWallet?.connector) {
+        try {
+          const currentNetwork = await getNetwork(primaryWallet.connector);
+          
+          if (currentNetwork !== 545) {
+            alert('Please switch to EVM Flow testnet');
+          }
+        } catch (error) {
+          console.error('Failed to get network:', error);
+        }
+      }
+    };
+  
+    checkNetwork();
+  }, [primaryWallet]);
 
   useEffect(() => {
     if (claimId) {
@@ -41,10 +65,8 @@ export default function ClaimPage() {
   };
 
   const handleMintNFT = async () => {
-    // Check if wallet is connected and matches
-    if (!primaryWallet?.address) {
-      alert("Please connect your wallet first");
-      return;
+    if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
+      throw new Error('This wallet is not an Ethereum wallet');
     }
 
     if (!order) {
@@ -62,17 +84,47 @@ export default function ClaimPage() {
 
     try {
       setLoading(true);
-      // TODO: Implement NFT minting logic
-      console.log(`Minting NFT for claim ${claimId}`);
+      setError("");
+
+      console.log(`Minting NFT for claim ${claimId} to address ${primaryWallet.address}`);
+
+      // Get wallet client
+      const walletClient = await primaryWallet.getWalletClient();
       
-      // Update mint status in database
+      // Call the mint function on the smart contract
+      const hash = await walletClient.writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: abi,
+        functionName: "mint",
+        args: [claimId, primaryWallet.address as `0x${string}`],
+      });
+
+      console.log("Transaction submitted:", hash);
+      
+      // Store transaction hash
+      setTransactionHash(hash);
+      
+      // Update mint status in database (you may need to add transaction_hash field to your database)
       await updateOrderStatus(claimId, { minted_status: true });
       
       // Refresh order data
       await fetchOrderDetails();
-    } catch (err) {
+
+      alert(`Transaction submitted! 🎉\nTransaction hash: ${hash}`);
+      
+    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       console.error("Error minting NFT:", err);
-      setError("Failed to mint NFT");
+      
+      // Handle specific error types
+      if (err.name === 'UserRejectedRequestError') {
+        setError("Transaction was rejected by user");
+      } else if (err.message?.includes("Claim already minted")) {
+        setError("This claim has already been minted");
+      } else if (err.message?.includes("insufficient funds")) {
+        setError("Insufficient funds for gas fees");
+      } else {
+        setError(`Failed to mint NFT: ${err.message || "Unknown error"}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -171,8 +223,21 @@ export default function ClaimPage() {
       <Navbar />
       
       <div className="px-4 py-8 max-w-md mx-auto">
-        <div className="text-center mb-2">
+        <div className="text-center mb-2 space-y-1">
           <p className="text-gray-600 text-sm">Claim ID: <span className="font-mono text-pink-600">{claimId}</span></p>
+          {transactionHash && (
+            <p className="text-gray-600 text-xs">
+              Transaction: 
+              <a 
+                href={`https://evm-testnet.flowscan.io/tx/${transactionHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-blue-600 hover:text-blue-800 underline ml-1"
+              >
+                {transactionHash.slice(0, 6)}...{transactionHash.slice(-4)}
+              </a>
+            </p>
+          )}
         </div>
 
         <Card className="mb-4">
