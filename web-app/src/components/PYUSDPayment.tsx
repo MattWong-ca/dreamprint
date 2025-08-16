@@ -5,17 +5,11 @@ import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 import { Button } from "@/components/ui/button";
 import { parseUnits, erc20Abi } from 'viem';
 import { insertOrder } from '@/lib/supabase';
-import { createPublicClient, http } from 'viem'
-import { sepolia } from "viem/chains";
 
 // Contract addresses
 const PYUSD_TOKEN_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
 const YOUR_WALLET_ADDRESS = "0xB68918211aD90462FbCf75b77a30bF76515422CE"; // Your wallet to receive PYUSD
 
-const publicClient = createPublicClient({
-  chain: sepolia,
-  transport: http(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`), // <-- must pass RPC
-})
 interface PYUSDPaymentProps {
   onPaymentSuccess: (claimId: string, transactionHash: string) => void;
   collageOptIn: boolean;
