@@ -43,14 +43,14 @@ export default function TakePhotoPage() {
 
     const startCamera = async () => {
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: facingMode,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                },
-                audio: false
-            });
+                         const mediaStream = await navigator.mediaDevices.getUserMedia({
+                 video: {
+                     facingMode: facingMode,
+                     width: { ideal: 1080 },
+                     height: { ideal: 1440 }
+                 },
+                 audio: false
+             });
 
             setStream(mediaStream);
             if (videoRef.current) {
@@ -74,14 +74,14 @@ export default function TakePhotoPage() {
 
         // Start new stream with switched camera
         try {
-            const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: newFacingMode,
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                },
-                audio: false
-            });
+                         const mediaStream = await navigator.mediaDevices.getUserMedia({
+                 video: {
+                     facingMode: newFacingMode,
+                     width: { ideal: 1080 },
+                     height: { ideal: 1440 }
+                 },
+                 audio: false
+             });
 
             setStream(mediaStream);
             if (videoRef.current) {
@@ -92,33 +92,58 @@ export default function TakePhotoPage() {
         }
     };
 
-    const capturePhoto = () => {
-        if (videoRef.current && canvasRef.current) {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            const context = canvas.getContext('2d');
+         const capturePhoto = () => {
+         if (videoRef.current && canvasRef.current) {
+             const video = videoRef.current;
+             const canvas = canvasRef.current;
+             const context = canvas.getContext('2d');
 
-            // Set canvas dimensions to match video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+             // Set canvas dimensions for polaroid format (3:4 aspect ratio, taller)
+             const targetWidth = 600;
+             const targetHeight = 800;
+             canvas.width = targetWidth;
+             canvas.height = targetHeight;
 
-                         // Draw the video frame to canvas (mirrored to match preview)
              if (context) {
-                 context.scale(-1, 1);
-                 context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                 // Clear canvas
+                 context.fillStyle = '#000000';
+                 context.fillRect(0, 0, canvas.width, canvas.height);
+                 
+                 // Calculate scaling to fit video into polaroid dimensions
+                 const videoAspect = video.videoWidth / video.videoHeight;
+                 const targetAspect = targetWidth / targetHeight;
+                 
+                 let drawWidth, drawHeight, offsetX, offsetY;
+                 
+                 if (videoAspect > targetAspect) {
+                     // Video is wider, fit to height
+                     drawHeight = targetHeight;
+                     drawWidth = drawHeight * videoAspect;
+                     offsetX = (targetWidth - drawWidth) / 2;
+                     offsetY = 0;
+                 } else {
+                     // Video is taller, fit to width
+                     drawWidth = targetWidth;
+                     drawHeight = drawWidth / videoAspect;
+                     offsetX = 0;
+                     offsetY = (targetHeight - drawHeight) / 2;
+                 }
+
+                 // Draw the image normally (no mirroring)
+                 context.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
              }
 
-            // Convert to data URL for display and storage
-            const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            setCapturedImage(imageDataUrl);
-            setPhotoTaken(true);
+             // Convert to data URL for display and storage
+             const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+             setCapturedImage(imageDataUrl);
+             setPhotoTaken(true);
 
-            // Stop camera stream after capture
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-        }
-    };
+             // Stop camera stream after capture
+             if (stream) {
+                 stream.getTracks().forEach(track => track.stop());
+             }
+         }
+     };
 
     const retakePhoto = () => {
         setPhotoTaken(false);
@@ -199,7 +224,6 @@ export default function TakePhotoPage() {
 
             <div className="px-4 py-8 max-w-md mx-auto">
                 <div className="text-center mb-4">
-                    <h1 className="text-2xl font-bold text-black mb-2">Dreamprint Camera</h1>
                     <p className="text-gray-600 text-sm">Claim ID: <span className="font-mono text-pink-600">{claimId}</span></p>
                 </div>
 
@@ -207,20 +231,20 @@ export default function TakePhotoPage() {
                     <CardContent className="p-4">
                         {!photoTaken ? (
                             // Camera View
-                            <div className="space-y-4">
-                                <div className="relative bg-black aspect-[4/3] overflow-hidden">
-                                    <video
-                                        ref={videoRef}
-                                        autoPlay
-                                        playsInline
-                                        muted
-                                        className={`w-full h-full object-cover`}
-                                    />
-                                    <canvas
-                                        ref={canvasRef}
-                                        className="hidden"
-                                    />
-                                </div>
+                                                         <div className="space-y-4">
+                                 <div className="relative bg-black overflow-hidden" style={{ width: '300px', height: '400px', margin: '50px auto 16px auto' }}>
+                                     <video
+                                         ref={videoRef}
+                                         autoPlay
+                                         playsInline
+                                         muted
+                                         className="w-full h-full object-cover"
+                                     />
+                                     <canvas
+                                         ref={canvasRef}
+                                         className="hidden"
+                                     />
+                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button
@@ -239,15 +263,15 @@ export default function TakePhotoPage() {
                                 </div>
                             </div>
                         ) : (
-                            // Photo Review & Edit
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <img
-                                        src={capturedImage}
-                                        alt="Captured photo"
-                                        className="w-full aspect-[4/3] object-cover bg-black"
-                                    />
-                                </div>
+                                                         // Photo Review & Edit
+                             <div className="space-y-4">
+                                 <div className="relative bg-black overflow-hidden" style={{ width: '300px', height: '400px', margin: '50px auto 16px auto' }}>
+                                     <img
+                                         src={capturedImage}
+                                         alt="Captured photo"
+                                         className="w-full h-full object-cover"
+                                     />
+                                 </div>
 
                                 {/* Filter Selection */}
                                 <div>
