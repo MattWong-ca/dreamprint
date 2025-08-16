@@ -161,11 +161,42 @@ function TakePhotoContent() {
         startCamera();
     };
 
+    // Compress image to reduce payload size for AI processing
+    const compressImage = (dataUrl: string, maxWidth = 1024, quality = 0.8): Promise<string> => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                // Calculate new dimensions maintaining aspect ratio
+                const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+                const newWidth = img.width * ratio;
+                const newHeight = img.height * ratio;
+                
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                
+                // Draw and compress
+                ctx?.drawImage(img, 0, 0, newWidth, newHeight);
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                resolve(compressedDataUrl);
+            };
+            
+            img.src = dataUrl;
+        });
+    };
+
     const handleAIEdit = async () => {
         try {
             setIsProcessingAI(true);
             setCurrentStep("processing");
             console.log(`AI editing with ${selectedFilter} style`);
+            
+            // Compress image before sending to AI processing
+            console.log("Compressing image for AI processing...");
+            const compressedImage = await compressImage(capturedImage);
+            console.log("Image compressed successfully");
             
             // Create prompt based on selected filter
             const promptMap = {
@@ -180,7 +211,7 @@ function TakePhotoContent() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    imageData: capturedImage,
+                    imageData: compressedImage, // Use compressed image
                     prompt: promptMap[selectedFilter]
                 }),
             });
