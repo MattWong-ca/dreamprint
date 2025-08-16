@@ -1,19 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Navbar from "@/components/Navbar"
+import Link from "next/link"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sticky Navbar */}
-      <nav className="sticky top-0 z-50 bg-black text-white px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="text-xl font-semibold">Dreamprint</div>
-          <Button variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-black">
-            Connect Wallet
-          </Button>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="px-6 py-20">
@@ -155,7 +149,9 @@ export default function HomePage() {
                   </li>
                 </ul>
                 <div className="mt-auto">
-                  <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">Try now</Button>
+                  <Link href="/pay">
+                    <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white">Try now</Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -178,9 +174,11 @@ export default function HomePage() {
                  
                 </ul>
                 <div className="mt-auto">
-                  <Button variant="outline" className="w-full bg-transparent">
-                    Get Started
-                  </Button>
+                  <Link href="/pay">
+                    <Button variant="outline" className="w-full bg-transparent">
+                      Get Started
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
