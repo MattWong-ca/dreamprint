@@ -8,7 +8,10 @@ import { insertOrder } from '@/lib/supabase';
 import { isEthereumWallet } from "@dynamic-labs/ethereum";
 
 // Contract addresses
-const PYUSD_TOKEN_ADDRESS = "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9";
+const PYUSD_ADDRESSES = {
+  sepolia: "0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9", // PYUSD Sepolia testnet
+  mainnet: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8"  // PYUSD Mainnet
+};
 const YOUR_WALLET_ADDRESS = "0xB68918211aD90462FbCf75b77a30bF76515422CE"; // Your wallet to receive PYUSD
 
 interface PYUSDPaymentProps {
@@ -22,6 +25,7 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "paying" | "success" | "error">("idle");
   const [paymentHash, setPaymentHash] = useState<string>("");
   const [loadingMessage, setLoadingMessage] = useState("");
+  const [useMainnet, setUseMainnet] = useState(false); // Default to testnet
 
   const payPYUSD = async () => {
     if (!primaryWallet || !isEthereumWallet(primaryWallet)) {
@@ -39,9 +43,12 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
       // 1 PYUSD = 1,000,000 wei (6 decimals)
       const paymentAmount = parseUnits("1", 6); // 1 PYUSD with 6 decimals
       
+      // Get the correct PYUSD contract address based on selected network
+      const pyusdAddress = useMainnet ? PYUSD_ADDRESSES.mainnet : PYUSD_ADDRESSES.sepolia;
+      
       // Direct transfer to your wallet
       const hash = await walletClient.writeContract({
-        address: PYUSD_TOKEN_ADDRESS as `0x${string}`,
+        address: pyusdAddress as `0x${string}`,
         abi: erc20Abi,
         functionName: 'transfer',
         args: [YOUR_WALLET_ADDRESS, paymentAmount],
@@ -152,6 +159,21 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
 
   return (
     <div className="space-y-4">
+      {/* Network Selection */}
+      <div className="flex items-center justify-end space-x-3">
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={useMainnet}
+            onChange={(e) => setUseMainnet(e.target.checked)}
+            disabled={isPaying || paymentStatus === "success"}
+            className="sr-only peer"
+          />
+          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+        </label>
+        <span className="text-sm text-gray-600">Mainnet</span>
+      </div>
+
       <Button
         onClick={payPYUSD}
         disabled={isPaying || paymentStatus === "success"}
@@ -172,12 +194,12 @@ export default function PYUSDPayment({ onPaymentSuccess, collageOptIn }: PYUSDPa
         <div className="text-center">
           <div className="text-green-600 text-sm mb-2">✅ Payment Submitted!</div>
           <a
-            href={`https://sepolia.etherscan.io/tx/${paymentHash}`}
+            href={`https://${useMainnet ? 'etherscan.io' : 'sepolia.etherscan.io'}/tx/${paymentHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 text-xs hover:underline block mb-2"
           >
-            View on Etherscan
+            View on {useMainnet ? 'Etherscan' : 'Sepolia Etherscan'}
           </a>
           <div className="text-gray-500 text-xs">
             You&apos;ll be notified if the transaction fails
