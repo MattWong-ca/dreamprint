@@ -16,7 +16,8 @@
     "crypto-browserify": "^3.12.1",
     "next": "15.4.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "replicate": "^1.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
