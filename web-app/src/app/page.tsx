@@ -10,7 +10,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="px-6 py-20 md:py-32 lg:py-40">
+      <section className="px-6 py-20 md:py-32 lg:py-32">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-black mb-6 leading-tight">
             Instant polaroid prints for crypto events
@@ -91,10 +91,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-pink-500">1</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Connect & Customize</h3>
+                <h3 className="text-xl font-semibold mb-4">Pay & Take Photo</h3>
                 <p className="text-gray-600">
-                  Connect your wallet and let our AI generate a personalized polaroid featuring your brand and the
-                  attendee
+                  Pay 1 PYUSD, and take a photo with your choice of Anime, Graffiti, or Pop Art style
                 </p>
               </CardContent>
             </Card>
@@ -104,10 +103,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-pink-500">2</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Print & Share</h3>
+                <h3 className="text-xl font-semibold mb-4">AI Transform & Mint</h3>
                 <p className="text-gray-600">
-                  Instantly print on Fujifilm Instax Mini film and encourage sharing on X or Farcaster for maximum
-                  virality
+                  Our AI transforms your photo into a stylized polaroid and adds a QR code. You can mint it as an NFT on Flow mainnet!
                 </p>
               </CardContent>
             </Card>
@@ -117,9 +115,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-pink-500">3</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Onchain Impact</h3>
+                <h3 className="text-xl font-semibold mb-4">Share & Get Refunded</h3>
                 <p className="text-gray-600">
-                  Each interaction brings users into your ecosystem while providing live UX feedback and measurable ROI
+                  Share your polaroid on X or Farcaster to get your 1 PYUSD back, creating viral marketing for crypto events
                 </p>
               </CardContent>
             </Card>
@@ -127,8 +125,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Collage Section */}
       <section className="px-6 py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Text Content */}
+            <div>
+              <h2 className="text-4xl font-bold text-black mb-8">Collage</h2>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                After an event, Dreamprint gathers all the polaroids from attendees who opted in and creates 
+                a beautiful cork board collage display. This creates a lasting digital memory of your event 
+                that showcases the community and creativity of all participants.
+              </p>
+            </div>
+            
+            {/* Collage Image */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <img
+                src="/collage.png"
+                alt="Dreamprint Collage - Cork board display of event polaroids"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="px-6 py-20 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-black mb-8">Simple Pricing</h2>
           <p className="text-xl text-gray-600 mb-16">75% cheaper than T-shirts with 10x the engagement</p>
