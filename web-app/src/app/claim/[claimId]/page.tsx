@@ -78,13 +78,13 @@ export default function ClaimPage() {
       return;
     }
 
-    const connectedAddress = primaryWallet.address.toLowerCase();
-    const orderAddress = order.wallet_address.toLowerCase();
+    // const connectedAddress = primaryWallet.address.toLowerCase();
+    // const orderAddress = order.wallet_address.toLowerCase();
     
-    if (connectedAddress !== orderAddress) {
-      alert("Connected wallet doesn't match the wallet that made this purchase");
-      return;
-    }
+    // if (connectedAddress !== orderAddress) {
+    //   alert("Connected wallet doesn't match the wallet that made this purchase");
+    //   return;
+    // }
 
     try {
       setLoading(true);
