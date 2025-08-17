@@ -10,16 +10,16 @@ export default function HomePage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="px-6 py-20">
+      <section className="px-6 py-20 md:py-32 lg:py-40">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-black mb-6 leading-tight">
-            Instant AI polaroid prints for crypto events
+            Instant polaroid prints for crypto events
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Instant Anime, Graffiti, and Pop Art prints that make your crypto events unforgettable!
+            Anime, Graffiti, and Pop Art prints that make your crypto events unforgettable!
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
             <Link href="/pay">
               <Button size="lg" className="bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 text-lg">
                 Get Started →
@@ -30,36 +30,52 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {/* Sample Images Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            <div className="aspect-square bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
-              <img
-                src="/crypto-enthusiast-polaroid.png"
-                alt="AI Polaroid Sample 1"
-                className="w-full h-full object-cover rounded"
-              />
-            </div>
-            <div className="aspect-square bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
-              <img
-                src="/placeholder-bczcz.png"
-                alt="AI Polaroid Sample 2"
-                className="w-full h-full object-cover rounded"
-              />
-            </div>
-            <div className="aspect-square bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
-              <img
-                src="/nft-collector-crypto-meetup-polaroid.png"
-                alt="AI Polaroid Sample 3"
-                className="w-full h-full object-cover rounded"
-              />
-            </div>
-            <div className="aspect-square bg-white rounded-lg shadow-md p-4 flex items-center justify-center">
-              <img
-                src="/web3-entrepreneur-polaroid.png"
-                alt="AI Polaroid Sample 4"
-                className="w-full h-full object-cover rounded"
-              />
-            </div>
+          {/* Sample Images */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            <Link href="/claim/97ABF9">
+              <div className="bg-white shadow-lg transform rotate-1 hover:rotate-0 transition-transform duration-300 cursor-pointer hover:shadow-xl">
+                <div className="p-4 pb-12">
+                  <img
+                    src="https://res.cloudinary.com/dkahnlgv2/image/upload/v1755378168/dreamprint-97ABF9-1755378168417.jpg"
+                    alt="AI Polaroid Sample 1"
+                    className="w-full aspect-square object-cover"
+                  />
+                </div>
+              </div>
+            </Link>
+            <Link href="/claim/OR2AMA">
+              <div className="bg-white shadow-lg transform -rotate-2 hover:rotate-0 transition-transform duration-300 cursor-pointer hover:shadow-xl">
+                <div className="p-4 pb-12">
+                  <img
+                    src="https://res.cloudinary.com/dkahnlgv2/image/upload/v1755381119/dreamprint-OR2AMA-1755381119218.jpg"
+                    alt="AI Polaroid Sample 2"
+                    className="w-full aspect-square object-cover"
+                  />
+                </div>
+              </div>
+            </Link>
+            <Link href="/claim/XXTMI4">
+              <div className="bg-white shadow-lg transform rotate-2 hover:rotate-0 transition-transform duration-300 cursor-pointer hover:shadow-xl">
+                <div className="p-4 pb-12">
+                  <img
+                    src="https://res.cloudinary.com/dkahnlgv2/image/upload/v1755382091/dreamprint-XXTMI4-1755382091199.jpg"
+                    alt="AI Polaroid Sample 3"
+                    className="w-full aspect-square object-cover"
+                  />
+                </div>
+              </div>
+            </Link>
+            <Link href="/claim/6XNNZQ">
+              <div className="bg-white shadow-lg transform -rotate-1 hover:rotate-0 transition-transform duration-300 cursor-pointer hover:shadow-xl">
+                <div className="p-4 pb-12">
+                  <img
+                    src="https://res.cloudinary.com/dkahnlgv2/image/upload/v1755387602/dreamprint-6XNNZQ-1755387602536.jpg"
+                    alt="AI Polaroid Sample 4"
+                    className="w-full aspect-square object-cover"
+                  />
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </section>
