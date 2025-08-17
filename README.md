@@ -53,6 +53,9 @@ Blockchain: PYUSD, Flow, Dynamic.xyz, Hardhat, Alchemy, MetaMask Mobile
 
 - Testnet address: [0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e](https://evm-testnet.flowscan.io/address/0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e)
   - [NFT collection](https://evm-testnet.flowscan.io/token/0x49ed9edf4157E02E26207cC648Ef3286F09B2f8e)
- 
+
+
 <img width="1440" height="780" alt="Screenshot 2025-08-17 at 7 48 13 AM" src="https://github.com/user-attachments/assets/106d6252-df2c-49c9-a387-1df102d608c4" />
+
+<img width="992" height="558" alt="Screenshot 2025-08-17 at 8 12 12 AM" src="https://github.com/user-attachments/assets/647f89df-335a-44b3-904d-fb91868142c5" />
 
