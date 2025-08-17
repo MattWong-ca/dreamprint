@@ -24,7 +24,7 @@ Please reach out if you want to set up something creative for your next event!
 
 <img width="1440" height="812" alt="collage" src="https://github.com/user-attachments/assets/31ec6d9e-a0f7-4d2c-b91f-d105cc28b080" />
 
-<img width="1440" height="858" alt="Screenshot 2025-08-17 at 1 10 32 AM" src="https://github.com/user-attachments/assets/fb00cffa-14cb-496a-a6cc-25c3ab67a623" />
+<img width="1440" height="807" alt="Screenshot 2025-08-17 at 8 19 35 AM" src="https://github.com/user-attachments/assets/d7447235-85fc-4899-ab97-53b1d2140d79" />
 
 
 # How it works
